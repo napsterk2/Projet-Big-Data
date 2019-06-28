@@ -42,6 +42,7 @@ def generate_road_network_adjacency_matrix(nbr_cities: int, max_distance: int) -
 
 def generate_objects_delivery_window(nbr_objects: int, max_delivery_deadline: int) -> [(int, int)]:
     """
+    Generates the delivery window for each object where object number i has to be delivered to city number i
 
     :param nbr_objects: The number of objects to deliver, should be equal to the number of cities for a problem instance
     :param max_delivery_deadline: The maximum delay for any object to be delivered
@@ -57,3 +58,6 @@ def generate_objects_delivery_window(nbr_objects: int, max_delivery_deadline: in
         result_array.append((delivery_window_start, random.randint(delivery_window_start, max_delivery_deadline)))
 
     return result_array
+
+
+def generate_solution(adjacency_matrix: [[int]], objects_delivery_window: [(int, int)]) -> [int]:
