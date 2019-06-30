@@ -60,4 +60,18 @@ def generate_objects_delivery_window(nbr_objects: int, max_delivery_deadline: in
     return result_array
 
 
-def generate_solution(adjacency_matrix: [[int]], objects_delivery_window: [(int, int)]) -> [int]:
+def generate_random_solution(nbr_cities: int) -> [int]:
+    """
+    Generates a random solution that may be realistic or not
+
+    :param nbr_cities: the number of cities for the problem instance
+    :return: a list of the cities reached by order
+    """
+    cities_list = list(range(nbr_cities))
+    solution = []
+    while len(cities_list) > 0:
+        _ = random.choice(cities_list)
+        solution.append(_)
+        cities_list.remove(_)
+
+    return solution
