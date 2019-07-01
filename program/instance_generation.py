@@ -77,3 +77,12 @@ def generate_random_solution(nbr_cities: int) -> [int]:
         cities_list.remove(_)
 
     return solution
+
+
+def generate_close2realistic_solution(objects_delivery_window: [(int, int)]) -> [int]:
+    temp = []
+    for index, object in enumerate(objects_delivery_window):
+        temp.append((index, object))
+    temp.sort(key=lambda x: x[1][0])
+    solution = [item[0] for item in temp]
+    return solution

@@ -40,7 +40,8 @@ def evaluate_solution(solution: [int], road_net_adjacency_matrix: [[int]]) -> in
 
 def is_solution_realistic(solution: [int], objects_delivery_window: [(int, int)]) -> bool:
     """
-    Checks whether a solution is a realistic one or not
+    Checks whether a solution is a realistic one or not considering the fact that it is possible to wait for a delivery
+    window opening
 
     :param solution: A list of number representing visited cities
     :param objects_delivery_window: A list of tuple where a tuple at index x represents the object to be delivered at
@@ -50,7 +51,8 @@ def is_solution_realistic(solution: [int], objects_delivery_window: [(int, int)]
     time = 0
     for city in solution:
 
-        if time < objects_delivery_window[city][0] or time > objects_delivery_window[city][1]:
+        if time > objects_delivery_window[city][1]:
             return False
-
+        elif time < objects_delivery_window[city][0]:
+            time = objects_delivery_window[city][0]
     return True

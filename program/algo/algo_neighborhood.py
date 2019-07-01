@@ -20,14 +20,18 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
     iter_nb = 0
     current_solution = starting_solution.copy()
     tabu_list = []
-    global_optimum_value = evaluate_solution(starting_solution, road_net_adjacency_matrix)
-    global_optimum = starting_solution
+
+    if is_solution_realistic(starting_solution, objects_delivery_window):
+        global_optimum = starting_solution
+        global_optimum_value = evaluate_solution(starting_solution, road_net_adjacency_matrix)
+    else:
+        global_optimum = []
+        global_optimum_value = 0
 
     # Stats variables
-    local_optimum_history = []
-    local_optimum_value_history = []
     nb_solutions_analyzed = 0
     nb_non_realistic_solutions_analyzed = 0
+    local_optimum_value_history = []
 
     while iter_nb < max_iter_nb:
 
@@ -48,8 +52,8 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
             else:
                 nb_non_realistic_solutions_analyzed += 1
 
-        # For stats
-        local_optimum_history.append(local_optimum)
+        if len(local_optimum) == 0:
+            break
         local_optimum_value_history.append(local_optimum_value)
 
         # Add the best neighbor found to the tabu_list
@@ -65,13 +69,17 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
         current_solution = local_optimum
         iter_nb += 1
 
-    return AlgoResult(
+    result = AlgoResult(
         used_algo=AlgoMethod.TABU_SEARCH,
         adjacency_matrix=road_net_adjacency_matrix,
         objects_delivery_window=objects_delivery_window,
         global_optimum_found=global_optimum,
         global_optimum_value=global_optimum_value,
-        local_optimum_history=local_optimum_history,
-        local_optimum_value_history=local_optimum_value_history,
-        non_realistic_solutions_met_percentage=nb_non_realistic_solutions_analyzed / nb_solutions_analyzed
+        starting_solution=starting_solution,
+        non_realistic_solutions_met_percentage=nb_non_realistic_solutions_analyzed / nb_solutions_analyzed,
+        iter_nb_done=iter_nb,
+        max_iter_nb=max_iter_nb,
+        local_optimum_value_history=local_optimum_value_history
     )
+    result.tabu_list_size = tabu_list_size
+    return result
