@@ -1,4 +1,4 @@
-from .utilities import generate_solution_neighbors, is_solution_realistic, evaluate_solution
+from program.utilities import generate_solution_neighbors, is_solution_realistic, evaluate_solution
 
 
 def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int, objects_delivery_window: [(int, int)],
