@@ -16,17 +16,19 @@ def generate_road_network_adjacency_matrix(nbr_cities: int, max_distance: int) -
     :param max_distance: the max distance between two different cities
     :return: an Adjacency Matrix
     """
-
+    """
     if nbr_cities < 1000:
         raise NotEnoughCitiesException("The number of cities has to be at least 1000")
-
+    """
     # Initialize the matrix
+    matrix = []
     city_base_array = [-1] * nbr_cities
-    matrix = [city_base_array] * nbr_cities
+    # Make sure we copy the array each time to not get the same reference for each row of the 2d list
+    for i in range(nbr_cities):
+        matrix.append(city_base_array.copy())
 
     # Randomly generates the distance between each city.
     for i in range(nbr_cities):
-
         for j in range(nbr_cities):
 
             # Distance between a same city has to be 0

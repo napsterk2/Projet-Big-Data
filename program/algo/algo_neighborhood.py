@@ -1,3 +1,4 @@
+from program.report import AlgoResult, AlgoMethod
 from program.utilities import generate_solution_neighbors, is_solution_realistic, evaluate_solution
 
 
@@ -22,6 +23,12 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
     global_optimum_value = evaluate_solution(starting_solution, road_net_adjacency_matrix)
     global_optimum = starting_solution
 
+    # Stats variables
+    local_optimum_history = []
+    local_optimum_value_history = []
+    nb_solutions_analyzed = 0
+    nb_non_realistic_solutions_analyzed = 0
+
     while iter_nb < max_iter_nb:
 
         local_optimum_value = 0
@@ -30,11 +37,20 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
         # neighbor's solution iteration
         for neighbor in generate_solution_neighbors(current_solution):
 
-            if neighbor not in tabu_list and is_solution_realistic(neighbor, objects_delivery_window):
-                neighbor_value = evaluate_solution(neighbor, road_net_adjacency_matrix)
-                if neighbor_value > local_optimum_value:
-                    local_optimum_value = neighbor_value
-                    local_optimum = neighbor
+            # For stats
+            nb_solutions_analyzed += 1
+            if is_solution_realistic(neighbor, objects_delivery_window):
+                if neighbor not in tabu_list:
+                    neighbor_value = evaluate_solution(neighbor, road_net_adjacency_matrix)
+                    if neighbor_value > local_optimum_value:
+                        local_optimum_value = neighbor_value
+                        local_optimum = neighbor
+            else:
+                nb_non_realistic_solutions_analyzed += 1
+
+        # For stats
+        local_optimum_history.append(local_optimum)
+        local_optimum_value_history.append(local_optimum_value)
 
         # Add the best neighbor found to the tabu_list
         tabu_list.append(local_optimum)
@@ -49,4 +65,13 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
         current_solution = local_optimum
         iter_nb += 1
 
-    return global_optimum, global_optimum_value
+    return AlgoResult(
+        used_algo=AlgoMethod.TABU_SEARCH,
+        adjacency_matrix=road_net_adjacency_matrix,
+        objects_delivery_window=objects_delivery_window,
+        global_optimum_found=global_optimum,
+        global_optimum_value=global_optimum_value,
+        local_optimum_history=local_optimum_history,
+        local_optimum_value_history=local_optimum_value_history,
+        non_realistic_solutions_met_percentage=nb_non_realistic_solutions_analyzed / nb_solutions_analyzed
+    )
