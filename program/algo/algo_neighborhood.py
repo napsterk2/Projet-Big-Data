@@ -69,6 +69,8 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
         current_solution = local_optimum
         iter_nb += 1
 
+    print("Found global optimum is : " + str(global_optimum_value))
+    print("Starting solution is found global optimum : " + str(starting_solution == global_optimum))
     result = AlgoResult(
         used_algo=AlgoMethod.TABU_SEARCH,
         adjacency_matrix=road_net_adjacency_matrix,
