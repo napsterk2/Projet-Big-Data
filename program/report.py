@@ -31,7 +31,8 @@ class AlgoResult(DynamicEmbeddedDocument):
 
 class ExecutionReport(DynamicDocument):
 
-    def __init__(self, exec_time: float, algo_result: AlgoResult, max_city_distance: int, max_window_delivery_len: int) -> None:
+    def __init__(self, exec_time: float, algo_result: AlgoResult, max_city_distance: int, max_window_delivery_len: int) \
+            -> None:
         super().__init__()
         self.exec_time = exec_time
         self.max_city_distance = max_city_distance
