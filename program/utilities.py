@@ -1,3 +1,8 @@
+import os
+
+import psutil
+
+
 def generate_solution_neighbors(curr_solution: [int]) -> [[int]]:
     """
     Generates a list of neighbors for a solution where a neighbor is the solution + 1 computation between element x
@@ -53,16 +58,17 @@ def evaluate_solution_path_duration(solution: [int], road_net_adjacency_matrix: 
 
     # Duration is initialized with the amount of time we need to wait to deliver the first object
     duration = obj_delivery_windows[solution[0]][0]
-    for index, city in enumerate(solution[1:]):
+    for index, city in enumerate(solution):
 
-        # If the spent duration is less than the opening of the delivery window for the next object to deliver, wait for
-        # it opening
-        if duration < obj_delivery_windows[city][0]:
-            duration += obj_delivery_windows[city][0] - duration
-        duration += road_net_adjacency_matrix[city][solution[index - 1]]
+        if index == len(solution) - 1:
+            # Add the duration for the final journey to get back to the starting city
+            duration += road_net_adjacency_matrix[solution[len(solution) - 1]][solution[0]]
+        else:
+            duration += road_net_adjacency_matrix[city][solution[index + 1]]
+            # If the truck arrives before the opening of the deliver window, it has to wait for the opening of it
+            if duration < obj_delivery_windows[solution[index + 1]][0]:
+                duration += obj_delivery_windows[solution[index + 1]][0] - duration
 
-    # Add the duration for the final journey to get back to the starting city
-    duration += road_net_adjacency_matrix[solution[len(solution) - 1]][solution[0]]
     return duration
 
 
@@ -79,16 +85,20 @@ def evaluate_solution_delivery_window_missmatch(solution: [int], road_net_adjace
     """
     total_missmatch = 0
 
-    for index, city in enumerate(solution[1:]):
-        city_arrive_time = evaluate_solution_path_duration(solution[:index + 1], road_net_adjacency_matrix,
-                                                           obj_delivery_windows)
-        if city_arrive_time > obj_delivery_windows[city][1]:
-            total_missmatch += city_arrive_time - obj_delivery_windows[city][1]
+    for index, city in enumerate(solution):
+
+        # prevent index out of bound
+        if index != len(solution) - 1:
+
+            city_arrive_time = evaluate_solution_path_duration(solution[:index + 1], road_net_adjacency_matrix,
+                                                               obj_delivery_windows)
+            if city_arrive_time > obj_delivery_windows[solution[index + 1]][1]:
+                total_missmatch += city_arrive_time - obj_delivery_windows[city][1]
 
     return total_missmatch
 
 
-def evaluate_solution(solution: [int], road_net_adjacency_matrix: [[int]], obj_delivery_windows: [(int, int)]) -> int:
+def evaluate_solution(solution: [int], road_net_adjacency_matrix: [[int]], obj_delivery_windows: [(int, int)]) -> float:
     """
     Evaluates the global quality of the solution with a scalar approach
 
@@ -99,5 +109,17 @@ def evaluate_solution(solution: [int], road_net_adjacency_matrix: [[int]], obj_d
     :return: An int representing the global quality of the solution
     """
     return 2 * evaluate_solution_path_len(solution, road_net_adjacency_matrix) \
-            + evaluate_solution_delivery_window_missmatch(solution, road_net_adjacency_matrix, obj_delivery_windows) \
-            + evaluate_solution_path_duration(solution, road_net_adjacency_matrix, obj_delivery_windows)
+            + 2 * evaluate_solution_delivery_window_missmatch(solution, road_net_adjacency_matrix, obj_delivery_windows) \
+            + 0.5 * evaluate_solution_path_duration(solution, road_net_adjacency_matrix, obj_delivery_windows)
+
+
+def analyze_ram_usage(target_list: [], is_running: [bool]) -> None:
+    """
+    Writes to an array the RAM usage as bytes every 0.1 sec
+
+    :param target_list: The list where to write the ram usage
+    :param is_running: Boolean passed as an array to pass it by reference instead of value
+    :return:
+    """
+    while is_running[0]:
+        target_list.append(psutil.Process(os.getpid()).memory_info().rss)
