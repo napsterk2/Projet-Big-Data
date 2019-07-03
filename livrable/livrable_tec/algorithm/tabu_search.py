@@ -41,6 +41,7 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
     start_time = time.time()
 
     while iter_nb < max_iter_nb:
+        iteration_start_time = time.time()
         local_optimum_value = None
         local_optimum = []
         # For each neighbor, check if it is a realistic solution and if its value is better than the old one for this
@@ -73,6 +74,7 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
 
         current_solution = local_optimum
         iter_nb += 1
+        print("Estimated remaining time : " + str((time.time() - iteration_start_time) * (max_iter_nb - iter_nb)) + " sec")
 
     end_time = time.time()
     analyze_ram[0] = False
@@ -125,17 +127,24 @@ def tabu_search_multistart(nb_runs, nb_iter, tabu_list_size, adjacency_matrix, o
 
 
 if __name__ == '__main__':
-    nb_cities = 1000
+    nb_cities = 600
     max_city_distance = 6000
     max_del_win_len = 12000
     matrix = generate_road_network_adjacency_matrix(nb_cities, max_city_distance)
     windows = generate_objects_delivery_window(nb_cities, max_del_win_len)
 
+    with open("real_problem_matrix.json", "w") as file:
+        file.write(json.dumps(matrix))
+
+    with open("real_problem_delivery_window.json", "w") as file:
+        file.write(json.dumps(windows))
+
     for index, result in enumerate(
-            tabu_search_multistart(5, 100, 40, matrix, windows, max_city_distance, max_del_win_len)):
+            tabu_search_multistart(1, 100, 40, matrix, windows, max_city_distance, max_del_win_len)):
         print("=============== RUN  " + str(index + 1) + "===============")
         print("Global optimum path length : " + str(result.global_opt_path_len))
         print("Global optimum delivery windows missmatch : " + str(result.global_opt_win_missmatch))
         print("Global optimum journey duration : " + str(result.global_opt_journey_duration))
+        print("Global optimum solution : " + str(result.global_opt))
         print("Execution time : " + str(result.exec_time))
         print()

@@ -19,7 +19,8 @@ def load_test_by_cities_nb(max_nb_cities: int):
             objects_delivery_window=windows,
             road_net_adjacency_matrix=matrix
         )
-        print("Nb Cities : " + str(i) + " | Nb Iter : 60 | Execution time : " + str(result.exec_time))
+        print("Nb Cities : " + str(i) + " | Nb Iter : 60 | Execution time : " + str(result.exec_time)
+              + " | average ram usage : " + str(result.avg_ram_usage))
 
 
 def load_test_by_iter_nb(max_iter_nb: int):
@@ -38,4 +39,5 @@ def load_test_by_iter_nb(max_iter_nb: int):
             objects_delivery_window=windows,
             road_net_adjacency_matrix=matrix
         )
-        print("Nb Cities : 100 | Nb Iter : " + str(i) + " | Execution time : " + str(result.exec_time))
+        print("Nb Cities : 100 | Nb Iter : " + str(i) + " | Execution time : " + str(result.exec_time)
+              + " | average ram usage : " + str(result.avg_ram_usage))
