@@ -113,7 +113,7 @@ def evaluate_solution(solution: [int], road_net_adjacency_matrix: [[int]], obj_d
     :return: An int representing the global quality of the solution
     """
     return evaluate_solution_path_len(solution, road_net_adjacency_matrix) \
-            + evaluate_solution_delivery_window_missmatch(solution, road_net_adjacency_matrix, obj_delivery_windows) \
+            + 5 * evaluate_solution_delivery_window_missmatch(solution, road_net_adjacency_matrix, obj_delivery_windows) \
             + 0.5 * evaluate_solution_path_duration(solution, road_net_adjacency_matrix, obj_delivery_windows)
 
 
