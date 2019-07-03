@@ -16,8 +16,8 @@ def generate_road_network_adjacency_matrix(nbr_cities: int, max_distance: int) -
     :param max_distance: the max distance between two different cities
     :return: an Adjacency Matrix
     """
-    if nbr_cities < 1000:
-        raise NotEnoughCitiesException("The number of cities has to be at least 1000")
+    # if nbr_cities < 1000:
+    #     raise NotEnoughCitiesException("The number of cities has to be at least 1000")
 
     # Initialize the matrix
     matrix = []

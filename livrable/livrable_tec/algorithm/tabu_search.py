@@ -1,10 +1,11 @@
 import time
+import json
 from threading import Thread
 
-from .result_class import AlgoResult
-from .utilities import evaluate_solution_path_len, evaluate_solution_path_duration, \
+from livrable.livrable_tec.algorithm.result_class import AlgoResult
+from livrable.livrable_tec.algorithm.utilities import evaluate_solution_path_len, evaluate_solution_path_duration, \
     evaluate_solution_delivery_window_missmatch, evaluate_solution, analyze_ram_usage, generate_solution_neighbors
-from ..dataset.random_generation import generate_random_solution, generate_road_network_adjacency_matrix, \
+from livrable.livrable_tec.dataset.random_generation import generate_random_solution, generate_road_network_adjacency_matrix, \
     generate_objects_delivery_window
 
 
@@ -124,7 +125,7 @@ def tabu_search_multistart(nb_runs, nb_iter, tabu_list_size, adjacency_matrix, o
 
 
 if __name__ == '__main__':
-    nb_cities = 200
+    nb_cities = 1000
     max_city_distance = 6000
     max_del_win_len = 12000
     matrix = generate_road_network_adjacency_matrix(nb_cities, max_city_distance)
