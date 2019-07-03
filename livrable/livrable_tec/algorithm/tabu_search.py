@@ -1,8 +1,10 @@
 import time
 from threading import Thread
 
-from program.report import AlgoResult
-from program.utilities import *
+from .result_class import AlgoResult
+from .utilities import evaluate_solution_path_len, evaluate_solution_path_duration, \
+    evaluate_solution_delivery_window_missmatch, evaluate_solution, analyze_ram_usage, generate_solution_neighbors
+from ..dataset.random_generation import generate_random_solution
 
 
 def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int, objects_delivery_window: [(int, int)],
@@ -74,7 +76,7 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
     analyze_ram[0] = False
     ram_analyzer.join()
     return AlgoResult(
-        adjacency_matrix= road_net_adjacency_matrix,
+        adjacency_matrix=road_net_adjacency_matrix,
         iter_nb=iter_nb,
         max_city_distance=max_city_distance,
         global_optimum=global_optimum,
@@ -83,6 +85,29 @@ def tabu_search(starting_solution: [int], tabu_list_size: int, max_iter_nb: int,
         starting_solution=starting_solution,
         objects_delivery_window=objects_delivery_window,
         max_delivery_win_len=max_del_win_len,
-        avg_ram= (sum(ram_usage) / len(ram_usage)) / 1000000,
+        avg_ram=(sum(ram_usage) / len(ram_usage)) / 1000000,
         tabu_list_size=tabu_list_size
     )
+
+
+def tabu_search_multistart(nb_runs, nb_iter, tabu_list_size, adjacency_matrix, obj_del_window, max_city_distance,
+                           max_del_win_len) -> [AlgoResult]:
+    """
+    Runs a tabu search using the multistart method
+
+    :param nb_runs:
+    :param nb_iter:
+    :param tabu_list_size:
+    :param adjacency_matrix:
+    :param obj_del_window:
+    :param max_city_distance:
+    :param max_del_win_len:
+    :return:
+    """
+    results = []
+    for i in range(nb_runs):
+        results.append(
+            tabu_search(generate_random_solution(len(obj_del_window)), tabu_list_size, nb_iter, obj_del_window,
+                        adjacency_matrix, max_city_distance, max_del_win_len)
+        )
+    return results

@@ -18,13 +18,13 @@ def run_tabu_search_multistart(nb_runs, nb_iter, tabu_list_size, adjacency_matri
 
 if __name__ == '__main__':
     connect('projet-big-data', host='34.76.156.13', port=8181)
-    nb_cities = 1000
+    nb_cities = 200
     max_city_distance = 6000
     max_del_win_len = 12000
     matrix = generate_road_network_adjacency_matrix(nb_cities, max_city_distance)
     windows = generate_objects_delivery_window(nb_cities, max_del_win_len)
 
-    for index, result in enumerate(run_tabu_search_multistart(1, 100, 40, matrix, windows, max_city_distance, max_del_win_len)):
+    for index, result in enumerate(run_tabu_search_multistart(5, 100, 40, matrix, windows, max_city_distance, max_del_win_len)):
         result.save()
         print("=============== RUN  " + str(index + 1) + "===============")
         print("Global optimum path length : " + str(result.global_opt_path_len))
