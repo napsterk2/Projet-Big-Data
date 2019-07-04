@@ -41,12 +41,12 @@ def generate_road_network_adjacency_matrix(nbr_cities: int, max_distance: int) -
     return matrix
 
 
-def generate_objects_delivery_window(nbr_objects: int, max_window_len: int) -> [(int, int)]:
+def generate_objects_delivery_window(nbr_objects: int, max_delivery_time: int) -> [(int, int)]:
     """
     Generates the delivery window for each object where object number i has to be delivered to city number i
 
     :param nbr_objects: The number of objects to deliver, should be equal to the number of cities for a problem instance
-    :param max_window_len: The maximum delay for any object to be delivered
+    :param max_delivery_time: The maximum time for an object to be delivered
     :return: A list of tuple where the first element of the tuple is the start of the delivery window and the second
     element is the end of the delivery window for the object i where i is the current list index
     """
@@ -55,8 +55,8 @@ def generate_objects_delivery_window(nbr_objects: int, max_window_len: int) -> [
     for i in range(nbr_objects):
         # Keeping the randomly generated delivery window start is here needed to make sure that the number modeling the
         # end of the window is greater than the one modeling the start
-        delivery_window_start = random.randint(0, max_window_len)
-        result_array.append((delivery_window_start, random.randint(delivery_window_start, max_window_len)))
+        delivery_window_start = random.randint(0, max_delivery_time)
+        result_array.append((delivery_window_start, random.randint(delivery_window_start, max_delivery_time)))
 
     return result_array
 

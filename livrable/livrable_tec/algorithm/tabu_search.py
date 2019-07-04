@@ -2,6 +2,8 @@ import time
 import json
 from threading import Thread
 
+import matplotlib.pyplot as plt
+
 from livrable.livrable_tec.algorithm.result_class import AlgoResult
 from livrable.livrable_tec.algorithm.utilities import evaluate_solution_path_len, evaluate_solution_path_duration, \
     evaluate_solution_delivery_window_missmatch, evaluate_solution, analyze_ram_usage, generate_solution_neighbors
@@ -127,20 +129,22 @@ def tabu_search_multistart(nb_runs, nb_iter, tabu_list_size, adjacency_matrix, o
 
 
 if __name__ == '__main__':
-    nb_cities = 600
-    max_city_distance = 6000
-    max_del_win_len = 12000
+    nb_cities = 100
+    nb_iterations = 200
+    max_city_distance = 4000
+    max_del_win_len = 6000
+    tabu_list_size = 50
     matrix = generate_road_network_adjacency_matrix(nb_cities, max_city_distance)
     windows = generate_objects_delivery_window(nb_cities, max_del_win_len)
-
+    """
     with open("real_problem_matrix.json", "w") as file:
         file.write(json.dumps(matrix))
 
     with open("real_problem_delivery_window.json", "w") as file:
         file.write(json.dumps(windows))
-
+    """
     for index, result in enumerate(
-            tabu_search_multistart(1, 100, 40, matrix, windows, max_city_distance, max_del_win_len)):
+            tabu_search_multistart(1, nb_iterations, tabu_list_size, matrix, windows, max_city_distance, max_del_win_len)):
         print("=============== RUN  " + str(index + 1) + "===============")
         print("Global optimum path length : " + str(result.global_opt_path_len))
         print("Global optimum delivery windows missmatch : " + str(result.global_opt_win_missmatch))
@@ -148,3 +152,12 @@ if __name__ == '__main__':
         print("Global optimum solution : " + str(result.global_opt))
         print("Execution time : " + str(result.exec_time))
         print()
+        plt.xlabel("Iteration number", fontsize=16)
+        plt.ylabel("Values", fontsize=16)
+        res1 = plt.plot(range(nb_iterations), [step['del_missmatch']
+                                               for step in result.local_optimum_value_history])
+        res2 = plt.plot(range(nb_iterations), [step['journey_duration']
+                                               for step in result.local_optimum_value_history])
+        res3 = plt.plot(range(nb_iterations), [step['path_len']
+                                               for step in result.local_optimum_value_history])
+        plt.show()

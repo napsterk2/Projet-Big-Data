@@ -56,21 +56,24 @@ def evaluate_solution_path_duration(solution: [int], road_net_adjacency_matrix: 
     city x. The first element of the tuple is the opening of the delivery window and the last one is the end of it
     :return: The duration of the path journey as an int
     """
+    if len(solution) > 0:
 
-    # Duration is initialized with the amount of time we need to wait to deliver the first object
-    duration = obj_delivery_windows[solution[0]][0]
-    for index, city in enumerate(solution):
+        # Duration is initialized with the amount of time we need to wait to deliver the first object
+        duration = obj_delivery_windows[solution[0]][0]
+        for index, city in enumerate(solution):
 
-        if index == len(solution) - 1:
-            # Add the duration for the final journey to get back to the starting city
-            duration += road_net_adjacency_matrix[solution[len(solution) - 1]][solution[0]]
-        else:
-            duration += road_net_adjacency_matrix[city][solution[index + 1]]
-            # If the truck arrives before the opening of the deliver window, it has to wait for the opening of it
-            if duration < obj_delivery_windows[solution[index + 1]][0]:
-                duration += obj_delivery_windows[solution[index + 1]][0] - duration
+            if index == len(solution) - 1:
+                # Add the duration for the final journey to get back to the starting city
+                duration += road_net_adjacency_matrix[solution[len(solution) - 1]][solution[0]]
+            else:
+                duration += road_net_adjacency_matrix[city][solution[index + 1]]
+                # If the truck arrives before the opening of the deliver window, it has to wait for the opening of it
+                if duration < obj_delivery_windows[solution[index + 1]][0]:
+                    duration += obj_delivery_windows[solution[index + 1]][0] - duration
 
-    return duration
+        return duration
+    else:
+        return 0
 
 
 def evaluate_solution_delivery_window_missmatch(solution: [int], road_net_adjacency_matrix: [[int]],
@@ -88,15 +91,12 @@ def evaluate_solution_delivery_window_missmatch(solution: [int], road_net_adjace
 
     for index, city in enumerate(solution):
 
-        # Prevents index out of bound
-        if index != len(solution) - 1:
-
-            city_arrive_time = evaluate_solution_path_duration(solution[:index + 1], road_net_adjacency_matrix,
-                                                               obj_delivery_windows)
-            # If the actual time is greater than the max delivery time for the current object, increase missmatch with
-            # the difference
-            if city_arrive_time > obj_delivery_windows[solution[index + 1]][1]:
-                total_missmatch += city_arrive_time - obj_delivery_windows[city][1]
+        city_arrive_time = evaluate_solution_path_duration(solution[:index + 1], road_net_adjacency_matrix,
+                                                           obj_delivery_windows)
+        # If the actual time is greater than the max delivery time for the current object, increase missmatch with
+        # the difference
+        if city_arrive_time > obj_delivery_windows[city][1]:
+            total_missmatch += city_arrive_time - obj_delivery_windows[city][1]
 
     return total_missmatch
 
@@ -113,7 +113,7 @@ def evaluate_solution(solution: [int], road_net_adjacency_matrix: [[int]], obj_d
     :return: An int representing the global quality of the solution
     """
     return evaluate_solution_path_len(solution, road_net_adjacency_matrix) \
-            + 3 * evaluate_solution_delivery_window_missmatch(solution, road_net_adjacency_matrix, obj_delivery_windows) \
+            + 5 * evaluate_solution_delivery_window_missmatch(solution, road_net_adjacency_matrix, obj_delivery_windows) \
             + 0.5 * evaluate_solution_path_duration(solution, road_net_adjacency_matrix, obj_delivery_windows)
 
 
