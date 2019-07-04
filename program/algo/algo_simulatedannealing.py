@@ -13,6 +13,7 @@ def totalEnergy():
     global path
     energy = 0
     coordinates = c_[x[path],y[path]]
+    print(coordinates)
     energy = sum(sqrt(sum((coordinates - roll(coordinates,-1,axis=0))**2,axis=1)))
     return energy
 
@@ -47,12 +48,23 @@ Henergy = []
 Htime = []
 Htemp = []
 
-#placement de N villes sur le plan
+#timewindows
+TWStart = []
+TWStop = []
+
+#Les coordonnées des villes (x,y) sont tirées aléatoirement selon la loi uniforme, x et y sont compris entre 0 et 1.
 x = random.uniform(size=cities)
 y = random.uniform(size=cities)
 
+i = 0
+while i < cities:
+    TWStart.append(random.randint(0, 10))
+    TWStop.append(random.randint(TWStart[i], TWStart[i]+100))
+    i = i+1
+
+
 #trajet initial réalisé selon l'ordre d'apparition des villes
-path = arange(cities)
+path = arange(cities) ##créé un genre de tableau avec l'ordre des villes
 initialPath = path.copy()
 
 #On calcule la distance initiale séparant les villes, qu'il va falloir minimiser
