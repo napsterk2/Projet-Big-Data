@@ -6,14 +6,31 @@ from program.instance_generation import generate_road_network_adjacency_matrix, 
 "Fonction de selection d'une arrète lors du déplacement d'une fourmie"
 def edge_selection(id_city: int, id_ant: int, remaining_cities: [int]) -> int:
 
-    '''for i in remaining_cities:
-        visibility = [0] * remaining_cities
-        visibility[i] = round(1/distance_matrix[id_city][i], 3)
+    visibility = [0] * nbr_cities
+    trail = [0] * nbr_cities
+    atractiveness = [0] * nbr_cities
+    total_atract = 0.0
+    move_proba = [0] * nbr_cities
+    frequency_tab = []
 
-        trail = [0] * remaining_cities
-        trail[i] = '''
-    selected_city = random.choice(remaining_cities)
+    for i in remaining_cities:
+        visibility[i] = round(1/distance_matrix[id_city][i], 5)
+        trail[i] = trails_matrix[id_city][i]
+        atractiveness[i] = gamma + round(((visibility[i]) * alpha) * (trail[i] * beta), 5)
+        total_atract = total_atract + atractiveness[i]
 
+    for j in remaining_cities:
+        move_proba[j] = round(atractiveness[j] / total_atract, 5)
+
+        if int(move_proba[j]*100) != 0:
+            for k in range(int(move_proba[j] * 100)):
+                frequency_tab.append(j)
+        else:
+            frequency_tab.append(j)
+
+    print(move_proba)
+
+    selected_city = random.choice(frequency_tab)
     return selected_city
 
 "Fonction de mise à jour des niveaux de pheromone: depôt et évaporation"
@@ -37,22 +54,28 @@ def trail_deposit(id_ant: int):
             x = ants_path[id_ant][i]
             y = ants_path[id_ant][0]
 
-        trails_matrix[x][y] = round(trails_matrix[x][y] + 100.0 / total_distance, 2)
-        trails_matrix[y][x] = round(trails_matrix[y][x] + 100.0 / total_distance , 2)
+        temporary_trail_matrix[x][y] = round(temporary_trail_matrix[x][y] + (quotient_div / total_distance), 5) * 2
+
+    print('distance parcourue: ', total_distance)
+    print('depot de pheromones: ', round((quotient_div / total_distance), 5))
 
 def trail_evaporation():
     for i in range(len(trails_matrix)):
         for j in range(len(trails_matrix[i])):
-            trails_matrix[i][j] = round((1 - 0.3) * trails_matrix[i][j], 2)
-
+            trails_matrix[i][j] = round((1 - 0.5) * trails_matrix[i][j], 5)
 
 "Nombre de villes"
-nbr_cities = 5
-distance_max = 10
+nbr_cities = 25
+distance_max = 100
 "Population de fourmie"
-ants = 3
+ants = 15
 
+"Quotient pour les différents calculs"
+alpha = 2.0
+beta = 4.0
+gamma = 0.1
 
+quotient_div = nbr_cities * distance_max
 
 "Matrice gardant les niveaux de pheromones"
 trails_matrix = []
@@ -89,8 +112,8 @@ for s in range(len(scout_path)):
         x = scout_path[s]
         y = scout_path[0]
     "Calcul de la quantité de pheromones a deposer"
-    trails_matrix[x][y] = round(100.0/total_distance_scout, 2)
-    trails_matrix[y][x] = round(100.0/total_distance_scout, 2)
+    trails_matrix[x][y] = round(quotient_div/total_distance_scout, 5)
+    "trails_matrix[y][x] = round(quotient_div/total_distance_scout, 5)"
 
 print('chemin initial ', scout_path)
 print('distance parcourue: ', total_distance_scout)
@@ -106,12 +129,17 @@ termination = False
     print(ants_path[i])"""
 iteration_counter = 0
 while not termination:
-
     print('\niteration: ', iteration_counter)
+
     ants_path = []
     path_base_array = [0] * nbr_cities
     for a in range(ants):
         ants_path.append(path_base_array.copy())
+
+    temporary_trail_matrix = []
+    matrix_base_array = [0] * nbr_cities
+    for i in range(nbr_cities):
+        temporary_trail_matrix.append(matrix_base_array.copy())
 
     for a in range(ants):
         print('\nfourmi: ', a)
@@ -129,11 +157,20 @@ while not termination:
                 next_city = edge_selection(current_city, a, remaining_cities)
                 current_city = next_city
 
-
         trail_deposit(a)
         print(ants_path[a],'\n')
-        for k in range(len(trails_matrix)):
-            print(trails_matrix[k])
+
+    "évaporation des anciennes pheromones"
     trail_evaporation()
+
+    "Apres évaporation des phéromones de l'itération précédente, on rajoute les phéromones de l'itération courante"
+    for i in range(len(trails_matrix)):
+        for j in range(len(trails_matrix)):
+            trails_matrix[i][j] = round(trails_matrix[i][j] + temporary_trail_matrix[i][j], 5)
+
     iteration_counter += 1
+
+    "Critère d'arret : 1000 itérations effectuées"
+    if iteration_counter == 300:
+        termination = True
 
